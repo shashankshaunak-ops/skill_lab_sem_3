@@ -1,6 +1,6 @@
 # CampusConnect
 
-CampusConnect is a student collaboration platform for sharing project ideas, presenting student skills, and finding potential teammates. Phase 1 provides the user/profile and project discovery foundation; its data model and documented interfaces are designed for a later team-membership, project-progress, and discussion phase.
+CampusConnect is a student collaboration platform for sharing project ideas, presenting student skills, and finding potential teammates. Phase 2 extends the Phase 1 foundation with persistent project teams, owner-managed progress, activity history, and private team discussions. See [Phase 2 integration and verification notes](./docs/PHASE_2.md).
 
 ## Features
 

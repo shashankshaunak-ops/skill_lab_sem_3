@@ -1,6 +1,6 @@
 # CampusConnect Phase 1 Integration Contract
 
-This document is the extension boundary for Phase 2. Extend the current application and models; do not create replacement User or Project models, duplicate API clients, or a second authentication system.
+This document records the Phase 1 extension boundary. Phase 2 additions and documented baseline discrepancies are in [PHASE_2.md](./PHASE_2.md). Existing Phase 1 response shapes below remain unchanged; team, status and discussion endpoints now extend them without a second Project model, API client or authentication system.
 
 ## Data models
 
