@@ -10,35 +10,26 @@ declare global {
   }
 }
 
-export function authenticate(
-  request: Request,
-  response: Response,
-  next: NextFunction,
-): void {
+export function authenticatedUserId(request: Request, response: Response): string | undefined {
+  if (!request.userId) {
+    response.status(401).json({ message: "Authentication is required." });
+    return undefined;
+  }
+  return request.userId;
+}
+
+export function authenticate(request: Request, response: Response, next: NextFunction): void {
   const authorization = request.header("authorization");
   const token = authorization?.startsWith("Bearer ")
     ? authorization.slice("Bearer ".length)
     : undefined;
-
   if (!token) {
     response.status(401).json({ message: "Authentication is required." });
     return;
   }
-
-  export function authenticatedUserId(
-    request: Request,
-    response: Response,
-  ): string | undefined {
-    if (!request.userId) {
-      response.status(401).json({ message: "Authentication is required." });
-      return undefined;
-    }
-    return request.userId;
-  }
-
   try {
     const payload = jwt.verify(token, env.jwtSecret);
-    if (typeof payload === "string" || typeof payload.sub !== "string") {
+    if (typeof payload === "string" || typeof payload.sub !== "string" || !/^[a-f\d]{24}$/i.test(payload.sub)) {
       response.status(401).json({ message: "The session token is invalid." });
       return;
     }

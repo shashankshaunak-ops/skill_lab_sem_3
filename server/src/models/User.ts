@@ -21,9 +21,8 @@ const userSchema = new Schema(
 
 userSchema.set("toJSON", {
   transform(_document, returnedObject) {
-    delete returnedObject.passwordHash;
-    delete returnedObject.__v;
-    return returnedObject;
+    const { passwordHash: _passwordHash, __v: _version, ...publicUser } = returnedObject;
+    return publicUser;
   },
 });
 
