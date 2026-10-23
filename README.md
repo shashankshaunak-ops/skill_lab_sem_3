@@ -1,70 +1,70 @@
-# CampusConnect
+# CampusConnect — Simple Course Demo
 
-CampusConnect is a student collaboration platform for sharing project ideas, presenting student skills, and finding potential teammates. Phase 2 extends the Phase 1 foundation with persistent project teams, owner-managed progress, activity history, and private team discussions. See [Phase 2 integration and verification notes](./docs/PHASE_2.md).
+A frontend-only website for a one-credit Skill Lab project. Browse fictional campus projects, create an idea, join/leave a sample team, and change its status.
 
-## Features
+**No backend, MongoDB, environment variables, login, real users or API calls.** Everyone tries the app as **Demo Student**. All names and projects are samples. Changes are saved only in this browser using `localStorage`; clearing browser data removes them.
 
-- Register, log in, and log out with JWT authentication and bcrypt password hashing.
-- Create and edit a student profile with a biography, skills, and optional avatar URL.
-- Browse public student profiles and search students by skill, name, or biography.
-- Create persistent project ideas and browse/filter them by title/description, tag, required skill, and status.
-- Open project detail pages showing the creator, requirements, team capacity, and status.
-- Responsive landing page, dashboard, forms, empty/loading/error states, and authentication-aware navigation.
+## Run
 
-## Requirements
-
-- Node.js 20 or later and npm 10 or later.
-- A running MongoDB instance or MongoDB Atlas connection string.
-
-## Setup
-
-From the repository root in PowerShell:
+Install Node.js 20 or later. Open a terminal in `skill_lab_sem_3`:
 
 ```powershell
-Copy-Item .env.example .env
 npm install
 npm run dev
 ```
 
-Update `.env` with a MongoDB connection string and a private, random JWT secret of at least 32 characters. The default local MongoDB URI is `mongodb://127.0.0.1:27017/campusconnect`. The Vite development server runs at `http://localhost:5173`; the API runs at `http://localhost:4000`.
-
-For production builds and local API startup:
+Open the local URL printed in the terminal, normally `http://localhost:5173`.
 
 ```powershell
 npm run build
-npm run start --workspace=server
+npm run test
 ```
 
-The frontend build is written to `client/dist`; the compiled API is written to `server/dist`. Serve the built frontend through a static host that forwards `/api` requests to the API server.
+Both commands type-check and build the website; `test` is a build check, not a separate automated test suite. Production files are generated in `client/dist`. For static hosting, route unknown page URLs to `index.html` so React Router works after refresh.
 
-## Environment variables
+## Only six source files
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `MONGODB_URI` | Yes | MongoDB connection URI. |
-| `JWT_SECRET` | Yes | Private signing key, at least 32 characters. |
-| `PORT` | No | API port; defaults to `4000`. |
-| `CLIENT_ORIGIN` | No | Allowed browser origin; defaults to `http://localhost:5173`. |
+```text
+client/src/
+├── main.tsx                   # Starts React and enables routing
+├── App.tsx                    # Navigation, state and the three pages
+├── data.ts                    # Project type, sample data, load/save
+├── styles.css                 # All styling and mobile layout
+└── components/
+    ├── Primitives.tsx         # Small shared buttons, badges and alerts
+    └── ProjectCard.tsx        # One reusable project card
+```
 
-Never commit `.env` or real secrets. `.env.example` contains names and safe local defaults only.
+The other files (`package.json`, `index.html`, `tsconfig.json`, `vite.config.ts`) configure npm, TypeScript and Vite. `node_modules` is downloaded library code, **not your source code**. Do not edit or submit it; `npm install` recreates it. You can collapse that folder in your editor.
 
-## Commands
+## How to explain the code
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Run the API and Vite development server together. |
-| `npm run build` | Compile/type-check the API and build/type-check the frontend. |
-| `npm run test` | Run the available TypeScript and frontend build checks. |
-| `npm run typecheck --workspace=server` | Type-check the API without emitting files. |
-| `npm run build --workspace=client` | Type-check and build the frontend. |
+1. **React components** are functions that return the page UI. There are three pages: project list, create form and project detail.
+2. **`useState`** in `App.tsx` stores the project array. Pages receive the array as **props**.
+3. A **callback** updates a project by replacing its entry using `map`. Creating a project adds an item with the spread operator.
+4. **Join** adds `Demo Student` to the members array; **leave** removes it with `filter`. The button blocks joining a full or completed project. Project owners are already members and cannot leave.
+5. The **status select** changes the project's status. Anyone can change it in this demo; there are no permissions or authentication rules.
+6. **`useEffect`** saves the project array to `localStorage` when it changes. The app loads this data when opened again. If storage is blocked, it shows a warning and works in memory.
+7. **React Router** selects a page based on its URL. **CSS** handles the colours, cards and responsive layout.
 
-The repository does not yet include a database-backed automated integration-test suite. Main application flows require MongoDB to be available.
+## Presentation checklist
 
-## Architecture
+- Browse the three sample projects and search by title or skill.
+- Open Campus Events Board, join the team, reload, then leave.
+- Open Digital Canteen Menu to demonstrate the full-team button.
+- Change a project's status to Completed and show that joining is disabled.
+- Create a new project; show Demo Student as the owner and first member.
+- Reload to demonstrate browser storage.
 
-- `client/`: React, TypeScript, Vite, React Router, and CSS.
-- `server/`: Express, TypeScript, Mongoose models, routes, and authentication middleware.
-- `docs/INTEGRATION_CONTRACT.md`: exact Phase 1 schemas, HTTP contract, frontend helpers, and Phase 2 extension rules.
-- Root npm workspaces and `.env.example` keep setup simple without extra infrastructure.
+To reset only this demo's data, use the browser console:
 
-See [the integration contract](./docs/INTEGRATION_CONTRACT.md) before implementing Phase 2.
+```javascript
+localStorage.removeItem("campusconnect.demo.projects.v1");
+location.reload();
+```
+
+## Git history and course scope
+
+The earlier full-stack version is preserved on `feature/campusconnect-phase2`. This simplified version is on `demo/simple-campusconnect`. No old commits were discarded.
+
+This is intentionally **not a full-stack application**. Check with your instructor if the marking rubric requires a backend or database before submitting. Do not describe browser storage as a database server or this demo as a real multi-user platform.
