@@ -19,6 +19,7 @@ export function SiteLayout() {
             <NavLink to="/projects">Ideas</NavLink>
             <NavLink to="/discover">Find teammates</NavLink>
             {user && <NavLink to="/dashboard">Dashboard</NavLink>}
+            {user && <NavLink to="/teams">My Teams</NavLink>}
           </nav>
           <div className="header-actions">
             {user ? (

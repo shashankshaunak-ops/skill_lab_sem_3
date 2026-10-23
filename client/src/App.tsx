@@ -9,6 +9,7 @@ import { DiscoverPage } from "./pages/DiscoverPage";
 import { LandingPage } from "./pages/LandingPage";
 import { EditProfilePage, ProfilePage } from "./pages/ProfilePages";
 import { CreateProjectPage, ProjectDetailPage, ProjectsPage } from "./pages/ProjectsPages";
+import { MyTeamsPage } from "./features/teams/MyTeamsPage";
 
 function Protected({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="login" element={<AuthPage mode="login" />} />
         <Route path="register" element={<AuthPage mode="register" />} />
         <Route path="dashboard" element={<Protected><DashboardPage /></Protected>} />
+        <Route path="teams" element={<Protected><MyTeamsPage /></Protected>} />
         <Route path="profile" element={<Protected><ProfilePage own /></Protected>} />
         <Route path="profile/edit" element={<Protected><EditProfilePage /></Protected>} />
         <Route path="students/:id" element={<ProfilePage />} />

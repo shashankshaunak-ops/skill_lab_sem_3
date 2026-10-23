@@ -5,6 +5,7 @@ import { Alert, Button, Loading, SkillList, StatusBadge } from "../components/Pr
 import { api, ApiError } from "../lib/api";
 import type { Project } from "../types";
 import { entityId } from "../types";
+import { ProjectWorkspace } from "../features/teams/ProjectWorkspace";
 
 function messageFor(error: unknown): string {
   return error instanceof ApiError ? error.message : "The request could not be completed.";
@@ -117,12 +118,15 @@ export function ProjectDetailPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
     setError("");
-    api<{ project: Project }>(`/projects/${encodeURIComponent(id ?? "")}`)
-      .then((result) => setProject(result.project))
-      .catch((caught: unknown) => setError(messageFor(caught)))
-      .finally(() => setLoading(false));
+    setProject(null);
+    api<{ project: Project }>(`/projects/${encodeURIComponent(id ?? "")}`, { signal: controller.signal })
+      .then((result) => { if (!controller.signal.aborted) setProject(result.project); })
+      .catch((caught: unknown) => { if (!controller.signal.aborted) setError(messageFor(caught)); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
   }, [id]);
 
   if (loading) return <div className="page-narrow"><Loading label="Loading project idea..." /></div>;
@@ -144,10 +148,7 @@ export function ProjectDetailPage() {
           <section><span className="eyebrow">Team size</span><p>{project.memberIds.length} of {project.maxMembers} members</p></section>
         </div>
       </article>
-      <section className="phase-two-slot">
-        <span className="eyebrow">Project workspace</span>
-        <p>Team membership, project updates, and discussions can be added here in Phase 2.</p>
-      </section>
+      <ProjectWorkspace key={entityId(project)} project={project} onProjectChange={setProject} />
     </div>
   );
 }
