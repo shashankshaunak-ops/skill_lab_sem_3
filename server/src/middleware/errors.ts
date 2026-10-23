@@ -1,12 +1,17 @@
 import type { ErrorRequestHandler, RequestHandler } from "express";
 import mongoose from "mongoose";
 import { ZodError } from "zod";
+import { TeamError } from "../services/team.service.js";
 
 export const notFound: RequestHandler = (_request, response) => {
   response.status(404).json({ message: "The requested endpoint was not found." });
 };
 
 export const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
+  if (error instanceof TeamError) {
+    response.status(error.status).json({ message: error.message });
+    return;
+  }
   if (
     error instanceof SyntaxError &&
     typeof error === "object" &&
